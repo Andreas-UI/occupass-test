@@ -1,11 +1,10 @@
 import { Outlet, createRootRouteWithContext } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
-import Header from '../components/Header'
-
 import type { QueryClient } from '@tanstack/react-query'
 import TanStackQueryLayout from '@/integrations/tanstack-query/layout'
-
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
+import { AppSideBar } from '@/components/app-sidebar'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -14,11 +13,13 @@ interface MyRouterContext {
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   component: () => (
     <>
-      <Header />
-
-      <Outlet />
+      <SidebarProvider open>
+        <AppSideBar />
+        <SidebarInset>
+          <Outlet />
+        </SidebarInset>
+      </SidebarProvider>
       <TanStackRouterDevtools />
-
       <TanStackQueryLayout />
     </>
   ),
