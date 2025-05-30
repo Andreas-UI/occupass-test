@@ -18,7 +18,7 @@ const items = [
     icon: LayoutDashboard,
   },
   {
-    title: 'Customer',
+    title: 'Customers',
     url: '/customers',
     icon: Users,
   },

@@ -1,4 +1,10 @@
-import { ArrowDown, ArrowUp, ChevronsUpDown } from 'lucide-react'
+import {
+  ArrowDown,
+  ArrowUp,
+  ChevronsUpDown,
+  Filter,
+  FilterX,
+} from 'lucide-react'
 import { Button } from './ui/button'
 import {
   DropdownMenu,
@@ -51,6 +57,7 @@ export function DataTableColumnHeader<TData, TValue>({
               ) : (
                 <ChevronsUpDown />
               )}
+              {column.getIsFiltered() ? <Filter /> : <FilterX />}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
