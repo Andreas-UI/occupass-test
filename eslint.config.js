@@ -10,6 +10,7 @@ export default [
       '@typescript-eslint/array-type': 'warn',
       '@typescript-eslint/ban-ts-comment': 'warn',
       '@typescript-eslint/no-unused-vars': 'warn',
+      '@typescript-eslint/no-unnecessary-condition': 'warn',
     },
   },
 ]

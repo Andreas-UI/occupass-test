@@ -1,4 +1,12 @@
-import { flexRender } from '@tanstack/react-table'
+import {
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from '@tanstack/react-table'
+import { useState } from 'react'
 import { DataTablePagination } from './dt-pagination'
 
 import {
@@ -9,15 +17,38 @@ import {
   TableHeader,
   TableRow,
 } from './ui/table'
-import type { Table as TSTable } from '@tanstack/react-table'
+import type {
+  ColumnDef,
+  ColumnFiltersState,
+  SortingState,
+} from '@tanstack/react-table'
 
-interface DataTableProps<TData> {
-  table: TSTable<TData>
+interface DataTableProps<T> {
+  data: any
+  columns: Array<ColumnDef<T>>
 }
 
-export function DataTable<TData>({ table }: DataTableProps<TData>) {
+export function DataTable<T>({ data, columns }: DataTableProps<T>) {
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+
+  const table = useReactTable({
+    data: data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
+    onColumnFiltersChange: setColumnFilters,
+    getFilteredRowModel: getFilteredRowModel(),
+    state: {
+      sorting,
+      columnFilters,
+    },
+  })
+
   return (
-    <div className="overflow-auto flex flex-col p-4 gap-2">
+    <div className="overflow-auto flex flex-col gap-2">
       <div className="overflow-hidden border rounded-lg">
         <Table>
           <TableHeader>
