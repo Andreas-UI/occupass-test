@@ -5,6 +5,7 @@ import type { QueryClient } from '@tanstack/react-query'
 import TanStackQueryLayout from '@/integrations/tanstack-query/layout'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { AppSideBar } from '@/components/app-sidebar'
+import { OrderDetailsDialog } from '@/components/order-details-dialog'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -17,6 +18,8 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         <AppSideBar />
         <SidebarInset>
           <Outlet />
+
+          <OrderDetailsDialog />
         </SidebarInset>
       </SidebarProvider>
       <TanStackRouterDevtools />

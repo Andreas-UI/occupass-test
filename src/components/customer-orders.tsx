@@ -1,9 +1,16 @@
+import { useDispatch } from 'react-redux'
+import { useEffect } from 'react'
 import { DataTableColumnHeader } from './dt-header'
 import { DataTable } from './dt'
 
-import type { Order } from '@/features/dtos'
+import { Button } from './ui/button'
+import type { Order, OrderDetail } from '@/features/dtos'
 import type { ColumnDef } from '@tanstack/react-table'
 import { GetOrdersQuery } from '@/features/orders/queries'
+import {
+  createOrderDetailsDialogData,
+  toggleOrderDetailsDialog,
+} from '@/redux/slice/order-details-dialog-slice'
 
 function parseDate(rawDate?: string) {
   if (!rawDate) return rawDate
@@ -18,7 +25,25 @@ function parseDate(rawDate?: string) {
 }
 
 export function CustomerOrders({ customerId }: { customerId: string }) {
+  const dispatch = useDispatch()
+
   const { data } = GetOrdersQuery(customerId)
+
+  useEffect(() => {
+    if (data?.results) {
+      dispatch(
+        createOrderDetailsDialogData(
+          data.results.reduce(
+            (dict, { order, orderDetails }) => {
+              dict[order.id] = orderDetails
+              return dict
+            },
+            {} as Record<number, Array<OrderDetail>>,
+          ),
+        ),
+      )
+    }
+  }, [data])
 
   /*
     Columns props and states.
@@ -39,7 +64,14 @@ export function CustomerOrders({ customerId }: { customerId: string }) {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="ID" />
       ),
-      cell: ({ row }) => <div>{row.original.id}</div>,
+      cell: ({ row }) => (
+        <Button
+          variant="link"
+          onClick={() => dispatch(toggleOrderDetailsDialog(row.original.id))} // Open Dialog
+        >
+          {row.original.id}
+        </Button>
+      ),
     },
     {
       accessorKey: 'customerId',
@@ -137,9 +169,9 @@ export function CustomerOrders({ customerId }: { customerId: string }) {
   return (
     <>
       <div className="text-left">
-        <h2 className="text-balance text-3xl font-semibold">Customer Orders</h2>
+        <h2 className="text-balance text-3xl font-semibold">Customer Orders {data?.results && `: ${customerId}`}</h2>
         <p className="text-muted-foreground">
-          Click a customer ID to get started
+          Click a customer order ID to show order details.
         </p>
       </div>
       <DataTable

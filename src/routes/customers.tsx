@@ -121,7 +121,7 @@ function RouteComponent() {
         <div className="text-left">
           <h2 className="text-balance text-3xl font-semibold">Customer List</h2>
           <p className="text-muted-foreground">
-            Click a header column to sort or filter.
+            Click a customer ID to show order.
           </p>
         </div>
         <DataTable columns={columns} data={data?.results || []} />
