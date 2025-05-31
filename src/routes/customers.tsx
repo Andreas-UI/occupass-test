@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { setSidebarMenuActive } from '@/lib/utils'
+import { MainHeader } from '@/components/main-header'
 
 export const Route = createFileRoute('/customers')({
   component: RouteComponent,
@@ -7,5 +8,9 @@ export const Route = createFileRoute('/customers')({
 
 function RouteComponent() {
   setSidebarMenuActive('/customers')
-  return <div>Hello "/customers"!</div>
+  return (
+    <>
+      <MainHeader text="Customers" />
+    </>
+  )
 }

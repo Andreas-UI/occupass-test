@@ -11,6 +11,7 @@ import {
   createOrderDetailsDialogData,
   toggleOrderDetailsDialog,
 } from '@/redux/slice/order-details-dialog-slice'
+import { toast } from 'sonner'
 
 function parseDate(rawDate?: string) {
   if (!rawDate) return rawDate
@@ -27,7 +28,7 @@ function parseDate(rawDate?: string) {
 export function CustomerOrders({ customerId }: { customerId: string }) {
   const dispatch = useDispatch()
 
-  const { data } = GetOrdersQuery(customerId)
+  const { data, isLoading, isError, isSuccess } = GetOrdersQuery(customerId)
 
   useEffect(() => {
     if (data?.results) {
@@ -43,7 +44,17 @@ export function CustomerOrders({ customerId }: { customerId: string }) {
         ),
       )
     }
-  }, [data])
+
+    if (isLoading) {
+      toast.info(`Loading data for #${customerId}...`)
+    }
+    if (isSuccess) {
+      toast.success(`Loaded data for #${customerId}`)
+    }
+    if (isError) {
+      toast.error(`Error loading #${customerId}`)
+    }
+  }, [data, isLoading, isError])
 
   /*
     Columns props and states.
@@ -169,7 +180,9 @@ export function CustomerOrders({ customerId }: { customerId: string }) {
   return (
     <>
       <div className="text-left">
-        <h2 className="text-balance text-3xl font-semibold">Customer Orders {data?.results && `: ${customerId}`}</h2>
+        <h2 className="text-balance text-3xl font-semibold">
+          Customer Orders {data && `: ${customerId}`}
+        </h2>
         <p className="text-muted-foreground">
           Click a customer order ID to show order details.
         </p>
