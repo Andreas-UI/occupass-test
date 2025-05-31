@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit'
 import OrderDetailsDialogReducer from './slice/order-details-dialog-slice'
 import SidebarActiveMenuReducer from './slice/sidebar-active-menu-slice'
+import QueryCustomersTableReducer from './slice/query-customers-table-slice'
 
 export const store = configureStore({
   reducer: {
     OrderDetailsDialog: OrderDetailsDialogReducer,
     SidebarActiveMenu: SidebarActiveMenuReducer,
+    QueryCustomersTable: QueryCustomersTableReducer,
   },
 })
 

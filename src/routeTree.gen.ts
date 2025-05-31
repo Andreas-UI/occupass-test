@@ -11,12 +11,19 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as SolutionImport } from './routes/solution'
 import { Route as OrdersImport } from './routes/orders'
 import { Route as CustomersImport } from './routes/customers'
 import { Route as IndexImport } from './routes/index'
 import { Route as DemoTanstackQueryImport } from './routes/demo.tanstack-query'
 
 // Create/Update Routes
+
+const SolutionRoute = SolutionImport.update({
+  id: '/solution',
+  path: '/solution',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const OrdersRoute = OrdersImport.update({
   id: '/orders',
@@ -67,6 +74,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrdersImport
       parentRoute: typeof rootRoute
     }
+    '/solution': {
+      id: '/solution'
+      path: '/solution'
+      fullPath: '/solution'
+      preLoaderRoute: typeof SolutionImport
+      parentRoute: typeof rootRoute
+    }
     '/demo/tanstack-query': {
       id: '/demo/tanstack-query'
       path: '/demo/tanstack-query'
@@ -83,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/customers': typeof CustomersRoute
   '/orders': typeof OrdersRoute
+  '/solution': typeof SolutionRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
 }
 
@@ -90,6 +105,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/customers': typeof CustomersRoute
   '/orders': typeof OrdersRoute
+  '/solution': typeof SolutionRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
 }
 
@@ -98,15 +114,27 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/customers': typeof CustomersRoute
   '/orders': typeof OrdersRoute
+  '/solution': typeof SolutionRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/customers' | '/orders' | '/demo/tanstack-query'
+  fullPaths:
+    | '/'
+    | '/customers'
+    | '/orders'
+    | '/solution'
+    | '/demo/tanstack-query'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/customers' | '/orders' | '/demo/tanstack-query'
-  id: '__root__' | '/' | '/customers' | '/orders' | '/demo/tanstack-query'
+  to: '/' | '/customers' | '/orders' | '/solution' | '/demo/tanstack-query'
+  id:
+    | '__root__'
+    | '/'
+    | '/customers'
+    | '/orders'
+    | '/solution'
+    | '/demo/tanstack-query'
   fileRoutesById: FileRoutesById
 }
 
@@ -114,6 +142,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CustomersRoute: typeof CustomersRoute
   OrdersRoute: typeof OrdersRoute
+  SolutionRoute: typeof SolutionRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
 }
 
@@ -121,6 +150,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CustomersRoute: CustomersRoute,
   OrdersRoute: OrdersRoute,
+  SolutionRoute: SolutionRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
 }
 
@@ -137,6 +167,7 @@ export const routeTree = rootRoute
         "/",
         "/customers",
         "/orders",
+        "/solution",
         "/demo/tanstack-query"
       ]
     },
@@ -148,6 +179,9 @@ export const routeTree = rootRoute
     },
     "/orders": {
       "filePath": "orders.tsx"
+    },
+    "/solution": {
+      "filePath": "solution.tsx"
     },
     "/demo/tanstack-query": {
       "filePath": "demo.tanstack-query.tsx"

@@ -1,4 +1,4 @@
-import { LayoutDashboard, NotepadText, Users } from 'lucide-react'
+import { Apple, LayoutDashboard, NotepadText, Users } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { useSelector } from 'react-redux'
 import type { RootState } from '@/redux/store'
@@ -29,6 +29,11 @@ const items = [
     url: '/orders',
     icon: NotepadText,
   },
+  {
+    title: 'Solution',
+    url: '/solution',
+    icon: Apple
+  }
 ]
 
 export function AppSideBar() {

@@ -18,8 +18,8 @@ export const GetCustomerDetailsAPI = async (id: string) => {
 }
 
 export interface QueryCustomersAPIProps {
-  ids: string[]
-  countryStartsWith: string
+  ids?: string[]
+  countryStartsWith?: string
   skip?: number
   take?: number
   orderBy?: string[]
