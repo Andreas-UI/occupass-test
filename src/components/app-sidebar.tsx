@@ -1,5 +1,7 @@
 import { LayoutDashboard, NotepadText, Users } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
+import { useSelector } from 'react-redux'
+import type { RootState } from '@/redux/store'
 import {
   Sidebar,
   SidebarContent,
@@ -7,8 +9,8 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenu,
+  SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSubButton,
 } from '@/components/ui/sidebar'
 
 const items = [
@@ -30,6 +32,10 @@ const items = [
 ]
 
 export function AppSideBar() {
+  const sidebarActiveMenuState = useSelector(
+    (state: RootState) => state.SidebarActiveMenu,
+  )
+
   return (
     <Sidebar>
       <SidebarContent>
@@ -39,12 +45,15 @@ export function AppSideBar() {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuSubButton asChild>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={item.url == sidebarActiveMenuState.route}
+                  >
                     <Link to={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
                     </Link>
-                  </SidebarMenuSubButton>
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
