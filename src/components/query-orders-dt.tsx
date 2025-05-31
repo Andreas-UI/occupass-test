@@ -1,77 +1,27 @@
-import { useDispatch } from 'react-redux'
-import { useEffect } from 'react'
 import { DataTableColumnHeader } from './dt-header'
-import { DataTable } from './dt'
-
-import { Button } from './ui/button'
-import type { Order, OrderDetail } from '@/features/dtos'
 import type { ColumnDef } from '@tanstack/react-table'
-import { GetOrdersQuery } from '@/features/orders/queries'
-import {
-  createOrderDetailsDialogData,
-  toggleOrderDetailsDialog,
-} from '@/redux/slice/order-details-dialog-slice'
+import type { Order } from '@/features/dtos'
+import { DataTable } from './dt'
+import { useEffect } from 'react'
 import { toast } from 'sonner'
+import type { QueryOrdersAPIProps } from '@/features/orders/api'
+import { QueryOrdersQuery } from '@/features/orders/queries'
 import { parseDate } from '@/lib/utils'
 
-export function CustomerOrders({ customerId }: { customerId: string }) {
-  const dispatch = useDispatch()
-
-  const { data, isLoading, isError, isSuccess } = GetOrdersQuery(customerId)
-
-  useEffect(() => {
-    if (data?.results) {
-      dispatch(
-        createOrderDetailsDialogData(
-          data.results.reduce(
-            (dict, { order, orderDetails }) => {
-              dict[order.id] = orderDetails
-              return dict
-            },
-            {} as Record<number, Array<OrderDetail>>,
-          ),
-        ),
-      )
-    }
-
-    if (isLoading) {
-      toast.info(`Loading data for #${customerId}...`)
-    }
-    if (isSuccess) {
-      toast.success(`Loaded data for #${customerId}`)
-    }
-    if (isError) {
-      toast.error(`Error loading #${customerId}`)
-    }
-  }, [data, isLoading, isError])
-
-  /*
-    Columns props and states.
-
-    Append `enableSorting: false` or `enableColumnFilter: false`to the relevant 
-    column definition to disable sorting, filtering, or both.
-    {
-      ...
-      enableSorting: false,
-      enableColumnFilter: false
-      ...
-    }
-  */
-
-  const columns: Array<ColumnDef<Order>> = [
+export function QueryOrdersDT({
+  params,
+  fields,
+}: {
+  params: QueryOrdersAPIProps
+  fields: Array<string>
+}) {
+  const fullColumns: Array<ColumnDef<Order>> = [
     {
       accessorKey: 'id',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="ID" />
       ),
-      cell: ({ row }) => (
-        <Button
-          variant="link"
-          onClick={() => dispatch(toggleOrderDetailsDialog(row.original.id))} // Open Dialog
-        >
-          {row.original.id}
-        </Button>
-      ),
+      cell: ({ row }) => <div>{row.original.id}</div>,
     },
     {
       accessorKey: 'customerId',
@@ -166,20 +116,32 @@ export function CustomerOrders({ customerId }: { customerId: string }) {
     },
   ]
 
-  return (
-    <>
-      <div className="text-left">
-        <h2 className="text-balance text-3xl font-semibold">
-          Customer Orders {data && `: ${customerId}`}
-        </h2>
-        <p className="text-muted-foreground">
-          Click a customer order ID to show order details.
-        </p>
+  const columns =
+    fields.length > 0
+      ? // @ts-ignore
+        fullColumns.filter((col) => fields.includes(col.accessorKey))
+      : fullColumns
+
+  const { data, isLoading, isError, isSuccess } = QueryOrdersQuery(params)
+  useEffect(() => {
+    if (isLoading) {
+      toast.info(`Loading data...`)
+    }
+    if (isSuccess) {
+      toast.success(`Loaded data successfully`)
+    }
+    if (isError) {
+      toast.error(`Error loading data}`)
+    }
+  }, [data, isLoading, isError])
+
+  if (data)
+    return (
+      <div className="flex flex-col gap-2 mb-16">
+        <div className="text-left">
+          <h2 className="text-balance text-xl font-semibold">Query Results</h2>
+        </div>
+        <DataTable columns={columns} data={data.results} />
       </div>
-      <DataTable
-        columns={columns}
-        data={data?.results?.map((result) => result.order) || []}
-      />
-    </>
-  )
+    )
 }

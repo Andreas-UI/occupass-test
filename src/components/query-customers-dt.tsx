@@ -1,49 +1,26 @@
-import { useState } from 'react'
-
-import { createFileRoute } from '@tanstack/react-router'
+import type { QueryCustomersAPIProps } from '@/features/customers/api'
+import { QueryCustomersQuery } from '@/features/customers/queries'
+import { DataTableColumnHeader } from './dt-header'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { Customer } from '@/features/dtos'
-import { MainHeader } from '@/components/main-header'
-import { DataTableColumnHeader } from '@/components/dt-header'
-import { GetAllCustomersQuery } from '@/features/customers/queries'
-import { DataTable } from '@/components/dt'
-import { Button } from '@/components/ui/button'
-import { CustomerOrders } from '@/components/customer-orders'
-import { setSidebarMenuActive } from '@/lib/utils'
+import { DataTable } from './dt'
+import { useEffect } from 'react'
+import { toast } from 'sonner'
 
-export const Route = createFileRoute('/')({
-  component: App,
-})
-
-function App() {
-  const { data } = GetAllCustomersQuery()
-  const [useSelectedId, setSelectedId] = useState<string>('')
-
-  setSidebarMenuActive('/')
-
-  /*
-    Columns props and states.
-
-    Append `enableSorting: false` or `enableColumnFilter: false`to the relevant 
-    column definition to disable sorting, filtering, or both.
-    {
-      ...
-      enableSorting: false,
-      enableColumnFilter: false
-      ...
-    }
-  */
-  const columns: Array<ColumnDef<Customer>> = [
+export function QueryCustomersDT({
+  params,
+  fields,
+}: {
+  params: QueryCustomersAPIProps
+  fields: Array<string>
+}) {
+  const fullColumns: Array<ColumnDef<Customer>> = [
     {
       accessorKey: 'id',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="ID" />
       ),
-      cell: ({ row }) => (
-        <Button variant="link" onClick={() => setSelectedId(row.original.id)}>
-          {row.original.id}
-        </Button>
-      ),
+      cell: ({ row }) => <div>{row.original.id}</div>,
     },
     {
       accessorKey: 'companyName',
@@ -117,19 +94,32 @@ function App() {
     },
   ]
 
-  return (
-    <>
-      <MainHeader text="Dashbord" />
-      <div className="@container flex flex-1 flex-col p-6 gap-6">
+  const columns =
+    fields.length > 0
+      ? // @ts-ignore
+        fullColumns.filter((col) => fields.includes(col.accessorKey))
+      : fullColumns
+
+  const { data, isLoading, isError, isSuccess } = QueryCustomersQuery(params)
+  useEffect(() => {
+    if (isLoading) {
+      toast.info(`Loading data...`)
+    }
+    if (isSuccess) {
+      toast.success(`Loaded data successfully`)
+    }
+    if (isError) {
+      toast.error(`Error loading data}`)
+    }
+  }, [data, isLoading, isError])
+
+  if (data)
+    return (
+      <div className="flex flex-col gap-2 mb-16">
         <div className="text-left">
-          <h2 className="text-balance text-3xl font-semibold">Customer List</h2>
-          <p className="text-muted-foreground">
-            Click a customer ID to show order.
-          </p>
+          <h2 className="text-balance text-xl font-semibold">Query Results</h2>
         </div>
-        <DataTable columns={columns} data={data?.results || []} />
-        <CustomerOrders customerId={useSelectedId} />
+        <DataTable columns={columns} data={data.results} />
       </div>
-    </>
-  )
+    )
 }
