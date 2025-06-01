@@ -20,6 +20,11 @@ npm install
 npm run start  
 ```
 
+To view this application in production: 
+* <https://occupass-test.netlify.app/>
+* <https://occupass-test.netlify.app/>
+* <https://occupass-test.netlify.app/>
+
 ## 🎨 Styling
 
 This project uses [Tailwind CSS](https://tailwindcss.com/) for utility-first styling, allowing for rapid and responsive UI development.

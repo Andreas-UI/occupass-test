@@ -1,9 +1,13 @@
 import {
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   getPaginationRowModel,
+  getSortedRowModel,
   useReactTable,
   type ColumnDef,
+  type ColumnFiltersState,
+  type SortingState,
 } from '@tanstack/react-table'
 import { DataTablePagination } from '../solution/dt-pagination'
 import {
@@ -21,6 +25,7 @@ import {
   setQueryCustomersParams,
 } from '@/redux/slice/query-customers-table-slice'
 import { DataTableToolbar } from './dt-toolbar'
+import { useState } from 'react'
 
 interface DataTableProps<T> {
   data: any
@@ -35,10 +40,21 @@ export function DataTable<T>({ data, isLoading, columns }: DataTableProps<T>) {
   )
   const pagination = queryCustomersTableState.pagination
 
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+
   const table = useReactTable({
     data: data?.results || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
+
+    // sorting
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
+
+    // filtering
+    onColumnFiltersChange: setColumnFilters,
+    getFilteredRowModel: getFilteredRowModel(),
 
     // pagination
     getPaginationRowModel: getPaginationRowModel(),
@@ -64,6 +80,8 @@ export function DataTable<T>({ data, isLoading, columns }: DataTableProps<T>) {
     // table state
     state: {
       pagination,
+      sorting,
+      columnFilters,
     },
   })
 
