@@ -20,13 +20,15 @@ import {
   setQueryCustomersPagination,
   setQueryCustomersParams,
 } from '@/redux/slice/query-customers-table-slice'
+import { DataTableToolbar } from './dt-toolbar'
 
 interface DataTableProps<T> {
   data: any
+  isLoading: boolean
   columns: Array<ColumnDef<T>>
 }
 
-export function DataTable<T>({ data, columns }: DataTableProps<T>) {
+export function DataTable<T>({ data, isLoading, columns }: DataTableProps<T>) {
   const dispatch = useDispatch()
   const queryCustomersTableState = useSelector(
     (state: RootState) => state.QueryCustomersTable,
@@ -67,6 +69,7 @@ export function DataTable<T>({ data, columns }: DataTableProps<T>) {
 
   return (
     <div className="overflow-auto flex flex-col gap-2">
+      <DataTableToolbar />
       <div className="overflow-hidden border rounded-lg">
         <Table>
           <TableHeader>
@@ -88,7 +91,17 @@ export function DataTable<T>({ data, columns }: DataTableProps<T>) {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows.length ? (
+            {isLoading ? (
+              Array.from({ length: pagination.pageSize }).map((_, index) => (
+                <TableRow key={`skeleton-${index}`}>
+                  {table.getAllLeafColumns().map((column) => (
+                    <TableCell key={`skeleton-cell-${column.id}-${index}`}>
+                      <div className="h-9 w-full animate-pulse rounded bg-gray-200" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}

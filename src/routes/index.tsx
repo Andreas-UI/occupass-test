@@ -1,38 +1,30 @@
-import { useState } from 'react'
-
-import { createFileRoute } from '@tanstack/react-router'
-import type { ColumnDef } from '@tanstack/react-table'
-import type { Customer } from '@/features/dtos'
-import { MainHeader } from '@/components/main-header'
-import { DataTableColumnHeader } from '@/components/dt-header'
-import { GetAllCustomersQuery } from '@/features/customers/queries'
-import { DataTable } from '@/components/dt'
-import { Button } from '@/components/ui/button'
 import { CustomerOrders } from '@/components/customer-orders'
+import { DataTableColumnHeader } from '@/components/dt-header'
+import { MainHeader } from '@/components/main-header'
+import { Button } from '@/components/ui/button'
+import { QueryCustomersQuery } from '@/features/customers/queries'
+import type { Customer } from '@/features/dtos'
 import { setSidebarMenuActive } from '@/lib/utils'
+import { createFileRoute } from '@tanstack/react-router'
+import { type ColumnDef } from '@tanstack/react-table'
+import { useState } from 'react'
+import { DataTable } from '@/components/solution/dt'
+import { useSelector } from 'react-redux'
+import type { RootState } from '@/redux/store'
 
 export const Route = createFileRoute('/')({
   component: App,
 })
 
 function App() {
-  const { data } = GetAllCustomersQuery()
-  const [useSelectedId, setSelectedId] = useState<string>('')
-
   setSidebarMenuActive('/')
 
-  /*
-    Columns props and states.
+  const queryCustomersTableState = useSelector(
+    (state: RootState) => state.QueryCustomersTable,
+  )
 
-    Append `enableSorting: false` or `enableColumnFilter: false`to the relevant 
-    column definition to disable sorting, filtering, or both.
-    {
-      ...
-      enableSorting: false,
-      enableColumnFilter: false
-      ...
-    }
-  */
+  const [useSelectedId, setSelectedId] = useState<string>('')
+
   const columns: Array<ColumnDef<Customer>> = [
     {
       accessorKey: 'id',
@@ -117,9 +109,21 @@ function App() {
     },
   ]
 
+  const { data, isLoading } = QueryCustomersQuery({
+    ids: queryCustomersTableState.queryParams.ids,
+    countryStartsWith: queryCustomersTableState.queryParams.countryStartsWith,
+    orderBy: queryCustomersTableState.queryParams.orderBy,
+    orderByDesc: queryCustomersTableState.queryParams.orderByDesc,
+    include: ['total'],
+
+    // pagination
+    skip: queryCustomersTableState.queryParams.skip,
+    take: queryCustomersTableState.queryParams.take,
+  })
+
   return (
     <>
-      <MainHeader text="Dashbord" />
+      <MainHeader text="My Solution" />
       <div className="@container flex flex-1 flex-col p-6 gap-6">
         <div className="text-left">
           <h2 className="text-balance text-3xl font-semibold">Customer List</h2>
@@ -127,7 +131,7 @@ function App() {
             Click a customer ID to show order.
           </p>
         </div>
-        <DataTable columns={columns} data={data?.results || []} />
+        <DataTable columns={columns} data={data} isLoading={isLoading} />
         <CustomerOrders customerId={useSelectedId} />
       </div>
     </>

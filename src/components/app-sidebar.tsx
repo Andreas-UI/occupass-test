@@ -15,25 +15,35 @@ import {
 
 const items = [
   {
-    title: 'Dashboard',
-    url: '/',
-    icon: LayoutDashboard,
+    group: 'Application',
+    menus: [
+      {
+        title: 'Solution',
+        url: '/',
+        icon: Apple,
+      },
+    ],
   },
   {
-    title: 'Customers',
-    url: '/customers',
-    icon: Users,
+    group: 'Miscellaneous',
+    menus: [
+      {
+        title: 'Dashboard',
+        url: '/dashboard',
+        icon: LayoutDashboard,
+      },
+      {
+        title: 'Customers',
+        url: '/customers',
+        icon: Users,
+      },
+      {
+        title: 'Orders',
+        url: '/orders',
+        icon: NotepadText,
+      },
+    ],
   },
-  {
-    title: 'Orders',
-    url: '/orders',
-    icon: NotepadText,
-  },
-  {
-    title: 'Solution',
-    url: '/solution',
-    icon: Apple
-  }
 ]
 
 export function AppSideBar() {
@@ -44,26 +54,28 @@ export function AppSideBar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={item.url == sidebarActiveMenuState.route}
-                  >
-                    <Link to={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {items.map((item) => (
+          <SidebarGroup>
+            <SidebarGroupLabel>{item.group}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {item.menus.map((menu) => (
+                  <SidebarMenuItem key={menu.title}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={menu.url == sidebarActiveMenuState.route}
+                    >
+                      <Link to={menu.url}>
+                        <menu.icon />
+                        <span>{menu.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
       </SidebarContent>
     </Sidebar>
   )

@@ -1,31 +1,38 @@
-import { CustomerOrders } from '@/components/customer-orders'
-import { DataTableColumnHeader } from '@/components/dt-header'
-import { MainHeader } from '@/components/main-header'
-import { Button } from '@/components/ui/button'
-import { QueryCustomersQuery } from '@/features/customers/queries'
-import type { Customer } from '@/features/dtos'
-import { setSidebarMenuActive } from '@/lib/utils'
-import { createFileRoute } from '@tanstack/react-router'
-import { type ColumnDef } from '@tanstack/react-table'
 import { useState } from 'react'
-import { DataTable } from '@/components/solution/dt'
-import { useSelector } from 'react-redux'
-import type { RootState } from '@/redux/store'
-import { DataTableToolbar } from '@/components/solution/dt-toolbar'
 
-export const Route = createFileRoute('/solution')({
+import { createFileRoute } from '@tanstack/react-router'
+import type { ColumnDef } from '@tanstack/react-table'
+import type { Customer } from '@/features/dtos'
+import { MainHeader } from '@/components/main-header'
+import { DataTableColumnHeader } from '@/components/dt-header'
+import { GetAllCustomersQuery } from '@/features/customers/queries'
+import { DataTable } from '@/components/dt'
+import { Button } from '@/components/ui/button'
+import { CustomerOrders } from '@/components/customer-orders'
+import { setSidebarMenuActive } from '@/lib/utils'
+
+export const Route = createFileRoute('/dashboard')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  setSidebarMenuActive('/solution')
-
-  const queryCustomersTableState = useSelector(
-    (state: RootState) => state.QueryCustomersTable,
-  )
-
+  const { data } = GetAllCustomersQuery()
   const [useSelectedId, setSelectedId] = useState<string>('')
 
+  setSidebarMenuActive('/dashboard')
+
+  /*
+    Columns props and states.
+
+    Append `enableSorting: false` or `enableColumnFilter: false`to the relevant 
+    column definition to disable sorting, filtering, or both.
+    {
+      ...
+      enableSorting: false,
+      enableColumnFilter: false
+      ...
+    }
+  */
   const columns: Array<ColumnDef<Customer>> = [
     {
       accessorKey: 'id',
@@ -110,21 +117,9 @@ function RouteComponent() {
     },
   ]
 
-  const { data } = QueryCustomersQuery({
-    ids: queryCustomersTableState.queryParams.ids,
-    countryStartsWith: queryCustomersTableState.queryParams.countryStartsWith,
-    orderBy: queryCustomersTableState.queryParams.orderBy,
-    orderByDesc: queryCustomersTableState.queryParams.orderByDesc,
-    include: ['total'],
-
-    // pagination
-    skip: queryCustomersTableState.queryParams.skip,
-    take: queryCustomersTableState.queryParams.take,
-  })
-
   return (
     <>
-      <MainHeader text="My Solution" />
+      <MainHeader text="Dashbord" />
       <div className="@container flex flex-1 flex-col p-6 gap-6">
         <div className="text-left">
           <h2 className="text-balance text-3xl font-semibold">Customer List</h2>
@@ -132,9 +127,7 @@ function RouteComponent() {
             Click a customer ID to show order.
           </p>
         </div>
-
-        <DataTableToolbar />
-        <DataTable columns={columns} data={data} />
+        <DataTable columns={columns} data={data?.results || []} />
         <CustomerOrders customerId={useSelectedId} />
       </div>
     </>

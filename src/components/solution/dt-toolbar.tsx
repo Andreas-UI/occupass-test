@@ -1,75 +1,66 @@
 import { useForm } from 'react-hook-form'
 import { Button } from '../ui/button'
-import { Card, CardContent, CardFooter } from '../ui/card'
-import {
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormDescription,
-  FormMessage,
-  Form,
-} from '../ui/form'
+import { FormField, FormItem, FormControl, FormMessage, Form } from '../ui/form'
 import { Input } from '../ui/input'
-import {
-  MultiSelector,
-  MultiSelectorTrigger,
-  MultiSelectorInput,
-  MultiSelectorContent,
-  MultiSelectorList,
-  MultiSelectorItem,
-} from '../ui/multi-select'
-import { TagsInput } from '../ui/tags-input'
 import { queryCustomersSchema } from './schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type z from 'zod'
 import { useDispatch, useSelector } from 'react-redux'
 import type { RootState } from '@/redux/store'
 import { setQueryCustomersParams } from '@/redux/slice/query-customers-table-slice'
+import { DTMultiSelect } from './dt-multiselect'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../ui/select'
+import { useEffect, useState } from 'react'
 
 const multiSelectItems = [
   {
-    key: 'id',
+    value: 'id',
     label: 'ID',
   },
   {
-    key: 'companyName',
+    value: 'companyName',
     label: 'Company Name',
   },
   {
-    key: 'contactName',
+    value: 'contactName',
     label: 'Contact Name',
   },
   {
-    key: 'contactTitle',
+    value: 'contactTitle',
     label: 'Contact Title',
   },
   {
-    key: 'address',
+    value: 'address',
     label: 'Address',
   },
   {
-    key: 'city',
+    value: 'city',
     label: 'City',
   },
   {
-    key: 'region',
+    value: 'region',
     label: 'Region',
   },
   {
-    key: 'postalCode',
+    value: 'postalCode',
     label: 'Postal Code',
   },
   {
-    key: 'country',
+    value: 'country',
     label: 'Country',
   },
   {
-    key: 'phone',
+    value: 'phone',
     label: 'Phone',
   },
   {
-    key: 'fax',
+    value: 'fax',
     label: 'Fax',
   },
 ]
@@ -85,7 +76,21 @@ export function DataTableToolbar() {
     resolver: zodResolver(queryCustomersSchema),
   })
 
+  useEffect(() => {
+    form.register('orderBy')
+    form.register('orderByDesc')
+  }, [form])
+
+  const [sortState, setSortState] = useState<{
+    type: 'asc' | 'desc'
+    columns: string[]
+  }>({
+    type: 'asc',
+    columns: [],
+  })
+
   function onSubmit(values: z.infer<typeof queryCustomersSchema>) {
+    console.log(values)
     dispatch(
       setQueryCustomersParams({
         ...queryCustomersTableState.queryParams,
@@ -97,126 +102,76 @@ export function DataTableToolbar() {
       }),
     )
   }
+
   return (
-    <Card className="@container">
-      <CardContent>
-        <Form {...form}>
-          <div className="flex flex-col gap-6">
-            <FormField
-              control={form.control}
-              name="ids"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>IDs</FormLabel>
-                  <FormControl>
-                    <TagsInput
-                      value={field.value || []}
-                      onValueChange={field.onChange}
-                      placeholder="Customer IDs"
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Press <kbd>Enter</kbd> after each ID.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="countryStartsWith"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Country Starts With</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Country starts with (e.x Ger, Ita, ...)"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+    <div className="@container flex items-center justify-between">
+      <Form {...form}>
+        <div className="flex flex-1 items-center gap-2">
+          <FormField
+            control={form.control}
+            name="countryStartsWith"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input placeholder="Search by country" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-              <span className="bg-background text-muted-foreground relative z-10 px-2">
-                Additional Filters
-              </span>
+          <FormItem>
+            <div className="flex flex-row">
+              <Select
+                defaultValue={sortState.type}
+                onValueChange={(value: 'asc' | 'desc') => {
+                  setSortState((prev) => ({
+                    ...prev,
+                    type: value,
+                  }))
+                }}
+              >
+                <SelectTrigger className="rounded-e-none">
+                  <SelectValue placeholder="Sort" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="asc">ASC</SelectItem>
+                  <SelectItem value="desc">DESC</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormControl>
+                <DTMultiSelect
+                  items={multiSelectItems}
+                  title="Columns"
+                  onChange={(selected) => {
+                    setSortState((prev) => ({
+                      ...prev,
+                      columns: selected,
+                    }))
+                  }}
+                  className="rounded-s-none"
+                />
+              </FormControl>
             </div>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              <FormField
-                control={form.control}
-                name="orderBy"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Order By</FormLabel>
-                    <FormControl>
-                      <MultiSelector
-                        onValuesChange={field.onChange}
-                        values={field.value || []}
-                      >
-                        <MultiSelectorTrigger>
-                          <MultiSelectorInput placeholder="Select columns" />
-                        </MultiSelectorTrigger>
-                        <MultiSelectorContent>
-                          <MultiSelectorList>
-                            {multiSelectItems.map((multiSelectItem) => (
-                              <MultiSelectorItem
-                                key={multiSelectItem.key}
-                                value={multiSelectItem.key}
-                              >
-                                {multiSelectItem.label}
-                              </MultiSelectorItem>
-                            ))}
-                          </MultiSelectorList>
-                        </MultiSelectorContent>
-                      </MultiSelector>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="orderByDesc"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Order By Desc</FormLabel>
-                    <FormControl>
-                      <MultiSelector
-                        onValuesChange={field.onChange}
-                        values={field.value || []}
-                      >
-                        <MultiSelectorTrigger>
-                          <MultiSelectorInput placeholder="Select columns" />
-                        </MultiSelectorTrigger>
-                        <MultiSelectorContent>
-                          <MultiSelectorList>
-                            {multiSelectItems.map((multiSelectItem) => (
-                              <MultiSelectorItem
-                                key={multiSelectItem.key}
-                                value={multiSelectItem.key}
-                              >
-                                {multiSelectItem.label}
-                              </MultiSelectorItem>
-                            ))}
-                          </MultiSelectorList>
-                        </MultiSelectorContent>
-                      </MultiSelector>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          </div>
-        </Form>
-      </CardContent>
-      <CardFooter>
-        <Button onClick={form.handleSubmit(onSubmit)}>Query</Button>
-      </CardFooter>
-    </Card>
+            <FormMessage />
+          </FormItem>
+        </div>
+      </Form>
+      <Button
+        onClick={() => {
+          form.setValue(
+            'orderBy',
+            sortState.type === 'asc' ? sortState.columns : [],
+          )
+          form.setValue(
+            'orderByDesc',
+            sortState.type === 'desc' ? sortState.columns : [],
+          )
+          form.handleSubmit(onSubmit)()
+        }}
+      >
+        Search
+      </Button>
+    </div>
   )
 }
