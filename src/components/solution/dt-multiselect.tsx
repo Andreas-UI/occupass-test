@@ -65,15 +65,16 @@ export function DTMultiSelect({
                     {selectedItems.size} selected
                   </Badge>
                 ) : (
-                  items
-                    .filter((item) => selectedItems.has(item.value))
+                  Array.from(selectedItems)
+                    .map((value) => items.find((i) => i.value === value))
+                    .filter(Boolean)
                     .map((item) => (
                       <Badge
                         variant="secondary"
-                        key={item.value}
+                        key={item!.value}
                         className="rounded-sm px-1 font-normal"
                       >
-                        {item.label}
+                        {item!.label}
                       </Badge>
                     ))
                 )}
