@@ -113,6 +113,7 @@ src/components/solution
 ### 2. Order Details View
 
 ![Order details](images/screen-2.png)
+
 6. Server-side pagination is implemented — loading new pages might take a moment.
 7. The selected `customerId` remains visible for easy tracking.
 8. Click on an `orderId` to display the specific order details.
@@ -120,4 +121,5 @@ src/components/solution
 ### 3. Individual Order Detail View
 
 ![alt text](images/screen-3.png)
+
 9. The selected `orderId` is displayed at the top, with the full order information shown beneath.
